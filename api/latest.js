@@ -4,5 +4,6 @@ module.exports = async function handler(req, res) {
   });
   let { result } = await response.json();
   if (typeof result === 'string') result = JSON.parse(result);
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.status(200).json(result ?? null);
 };
