@@ -94,10 +94,11 @@ body {
 
   function applyContactId() {
     const val = document.getElementById('contact-id').value.trim();
-    if (val) mountWidget(val);
+    if (val) window.location.href = '?contactId=' + encodeURIComponent(val);
   }
 
-  const defaultId = randomId();
+  const params = new URLSearchParams(window.location.search);
+  const defaultId = params.get('contactId') || randomId();
   document.getElementById('contact-id').value = defaultId;
   mountWidget(defaultId);
 </script>
