@@ -269,22 +269,23 @@
           <div class="label">Duration</div>
           <div class="value">${formatDuration(analytics.duration)}</div>
         </div>
-        <div class="stat-card accent-green">
+        ${analytics.cost != null ? `<div class="stat-card accent-green">
           <div class="label">Cost</div>
           <div class="value">$${analytics.cost.toFixed(4)}</div>
-        </div>
-        <div class="stat-card accent-purple">
+        </div>` : ''}
+        ${analytics.tokenUsage != null ? `<div class="stat-card accent-purple">
           <div class="label">Tokens Used</div>
           <div class="value">${analytics.tokenUsage.toLocaleString()}</div>
-        </div>
+        </div>` : ''}
       </div>
 
+      ${analytics.conversationHistory?.length ? `
       <div class="section">
         <div class="section-header">💬 Conversation Transcript</div>
         <div class="transcript">
           ${renderTranscript(analytics.conversationHistory)}
         </div>
-      </div>
+      </div>` : ''}
 
       ${analytics.memory ? `
       <div class="section">
