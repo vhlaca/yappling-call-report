@@ -1,8 +1,13 @@
-const { Redis } = require('@upstash/redis');
-const redis = Redis.fromEnv();
-
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-  await redis.set('latestCall', { ...req.body, receivedAt: new Date().toISOString() });
+  const payload = JSON.stringify({ ...req.body, receivedAt: new Date().toISOString() });
+  await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/latestCall`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
   res.status(200).json({ ok: true });
 };
