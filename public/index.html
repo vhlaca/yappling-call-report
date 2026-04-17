@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yappling · Call Report</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222636;
+      --border: #2e3248;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e8eaf6;
+      --text-muted: #7b82a6;
+      --user-bg: #2e3248;
+      --assistant-bg: #1e2a4a;
+      --assistant-accent: #6c63ff;
+      --tag-bg: #252a3d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px; }
+    .header .bot-name { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+    .badge {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+    .direction-badge {
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.3);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .stat-card .label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .stat-card .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .stat-card .unit { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; margin-left: 3px; }
+    .stat-card.accent-green .value { color: var(--accent2); }
+    .stat-card.accent-purple .value { color: var(--accent); }
+
+    /* Section */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Transcript */
+    .transcript { padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+
+    .message { display: flex; gap: 10px; max-width: 85%; }
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.assistant { align-self: flex-start; }
+
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; margin-top: 2px;
+    }
+    .assistant .avatar { background: rgba(108,99,255,0.2); color: var(--accent); }
+    .user .avatar { background: rgba(0,212,170,0.15); color: var(--accent2); }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .assistant .bubble {
+      background: var(--assistant-bg);
+      border: 1px solid rgba(108,99,255,0.2);
+      border-top-left-radius: 4px;
+    }
+    .user .bubble {
+      background: var(--user-bg);
+      border: 1px solid var(--border);
+      border-top-right-radius: 4px;
+    }
+    .timestamp {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+    .user .timestamp { text-align: right; }
+
+    /* Memory */
+    .memory-content {
+      padding: 20px 22px;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .memory-content strong { color: var(--accent2); }
+
+    /* Empty / waiting state */
+    .waiting {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
+      gap: 16px;
+    }
+    .waiting .icon { font-size: 48px; animation: pulse 2s ease-in-out infinite; }
+    .waiting h2 { font-size: 1.2rem; color: var(--text-muted); font-weight: 500; }
+    .waiting p { font-size: 0.85rem; color: var(--text-muted); opacity: 0.6; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* Live dot */
+    .live-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--accent2);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .message { max-width: 95%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="app">
+    <div class="waiting">
+      <div class="icon">📞</div>
+      <h2>Waiting for a call to end…</h2>
+      <p>This page will update automatically when Yappling sends a webhook.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function formatTime(iso) {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function formatDuration(seconds) {
+    if (seconds < 60) return `${seconds}s`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  }
+
+  function renderMemory(text) {
+    return text
+      .replace(/### (.+)/g, '<strong>$1</strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function renderTranscript(history) {
+    return history
+      .filter(e => e.type === 'transcript' && e.text && e.text.trim() && e.text.trim() !== '.')
+      .map(e => {
+        const isAssistant = e.speaker === 'assistant';
+        const avatarIcon = isAssistant ? '🤖' : '👤';
+        return `
+          <div class="message ${e.speaker}">
+            <div class="avatar">${avatarIcon}</div>
+            <div>
+              <div class="bubble">${e.text}</div>
+              <div class="timestamp">${formatTime(e.timestamp)}</div>
+            </div>
+          </div>`;
+      }).join('');
+  }
+
+  function render(data) {
+    const { call, analytics, voiceBot, receivedAt } = data;
+    const receivedDate = new Date(receivedAt).toLocaleString();
+
+    document.getElementById('app').innerHTML = `
+      <div class="header">
+        <div class="header-left">
+          <div class="logo">🎙️</div>
+          <div>
+            <h1>Call Report</h1>
+            <div class="bot-name">${voiceBot.name}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="direction-badge">${call.direction}</span>
+          <span class="badge">${call.sid}</span>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="label">Duration</div>
+          <div class="value">${formatDuration(analytics.duration)}</div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="label">Cost</div>
+          <div class="value">$${analytics.cost.toFixed(4)}</div>
+        </div>
+        <div class="stat-card accent-purple">
+          <div class="label">Tokens Used</div>
+          <div class="value">${analytics.tokenUsage.toLocaleString()}</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">💬 Conversation Transcript</div>
+        <div class="transcript">
+          ${renderTranscript(analytics.conversationHistory)}
+        </div>
+      </div>
+
+      ${analytics.memory ? `
+      <div class="section">
+        <div class="section-header">🧠 Memory &amp; Summary</div>
+        <div class="memory-content">${renderMemory(analytics.memory)}</div>
+      </div>` : ''}
+
+      <div style="text-align:center;color:var(--text-muted);font-size:0.75rem;margin-top:16px;">
+        <span class="live-dot"></span>Live · Last received ${receivedDate}
+      </div>
+    `;
+  }
+
+  async function poll() {
+    try {
+      const res = await fetch('/api/latest');
+      const data = await res.json();
+      if (data) render(data);
+    } catch (e) { /* server not ready yet */ }
+  }
+
+  poll();
+  setInterval(poll, 3000);
+</script>
+</body>
+</html>
