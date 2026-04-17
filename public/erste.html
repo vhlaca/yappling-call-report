@@ -94,11 +94,12 @@ body {
 
   function applyContactId() {
     const val = document.getElementById('contact-id').value.trim();
-    if (val) window.location.href = '?contactId=' + encodeURIComponent(val);
+    if (!val) return;
+    const widget = document.querySelector('yappling-voice');
+    if (widget) widget.setContext({ contactId: val });
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const defaultId = params.get('contactId') || randomId();
+  const defaultId = randomId();
   document.getElementById('contact-id').value = defaultId;
   mountWidget(defaultId);
 </script>
