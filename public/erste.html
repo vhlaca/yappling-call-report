@@ -2,6 +2,7 @@
 <html>
 <head>
 <style>
+* { box-sizing: border-box; }
 body {
   background-image: url('erste.png');
   background-size: auto 100%;
@@ -13,10 +14,92 @@ body {
   min-height: 100vh;
   transition: background-image 0.3s ease;
 }
+
+#contact-bar {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 14px;
+  z-index: 9999;
+}
+
+#contact-bar label {
+  color: #aaa;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#contact-id {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  padding: 4px 10px;
+  width: 160px;
+  outline: none;
+}
+
+#contact-id:focus {
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.15);
+}
+
+#apply-btn {
+  background: #6c63ff;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#apply-btn:hover { background: #574fd6; }
 </style>
 </head>
 <body>
+
+<div id="contact-bar">
+  <label>Contact ID</label>
+  <input id="contact-id" type="text" placeholder="user_123" />
+  <button id="apply-btn" onclick="applyContactId()">Apply</button>
+</div>
+
+<div id="widget-container"></div>
+
 <script src="https://widget.yappling.com/v1/widget.js"></script>
-<yappling-voice widget-key="wgt_8b1cab89652b25b9" server-url="https://yappling.com"></yappling-voice>
+<script>
+  function randomId() {
+    return 'user_' + Math.random().toString(36).slice(2, 9);
+  }
+
+  function mountWidget(contactId) {
+    const container = document.getElementById('widget-container');
+    container.innerHTML = '';
+    const el = document.createElement('yappling-voice');
+    el.setAttribute('widget-key', 'wgt_8b1cab89652b25b9');
+    el.setAttribute('server-url', 'https://yappling.com');
+    el.setAttribute('context', JSON.stringify({ contactId }));
+    container.appendChild(el);
+  }
+
+  function applyContactId() {
+    const val = document.getElementById('contact-id').value.trim();
+    if (val) mountWidget(val);
+  }
+
+  const defaultId = randomId();
+  document.getElementById('contact-id').value = defaultId;
+  mountWidget(defaultId);
+</script>
 </body>
 </html>
